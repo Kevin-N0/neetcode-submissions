@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "problem_count": 2,
+  "problems": [
+    {
+      "problem_dir": "Data Structures & Algorithms/concatenation-of-array",
+      "category": "Data Structures & Algorithms",
+      "problem": "concatenation-of-array",
+      "category_slug": "data-structures-and-algorithms",
+      "problem_slug": "concatenation-of-array",
+      "solution_reference": null,
+      "interview_reference": null
+    },
+    {
+      "problem_dir": "Data Structures & Algorithms/duplicate-integer",
+      "category": "Arrays & Hashing",
+      "problem": "Contains Duplicate",
+      "category_slug": "arrays-and-hashing",
+      "problem_slug": "contains-duplicate",
+      "solution_reference": {
+        "path": "Data Structures & Algorithms/duplicate-integer/submission-9.py",
+        "number": 9,
+        "reference_type": "SOLUTION_REFERENCE",
+        "category": "Arrays & Hashing",
+        "preferred_solution": "S3",
+        "problem": "Contains Duplicate",
+        "difficulty": "Easy"
+      },
+      "interview_reference": {
+        "path": "Data Structures & Algorithms/duplicate-integer/submission-10.py",
+        "number": 10,
+        "reference_type": "INTERVIEW_REFERENCE",
+        "category": "Arrays & Hashing",
+        "preferred_solution": "S3",
+        "problem": "Contains Duplicate",
+        "difficulty": "Easy"
+      }
+    }
+  ]
+}

@@ -4,37 +4,31 @@
   "problems": [
     {
       "problem_dir": "Data Structures & Algorithms/concatenation-of-array",
-      "category": "Data Structures & Algorithms",
       "problem": "concatenation-of-array",
-      "category_slug": "data-structures-and-algorithms",
       "problem_slug": "concatenation-of-array",
+      "category": "Data Structures & Algorithms",
+      "category_slug": "data-structures-and-algorithms",
+      "difficulty": "Unknown",
+      "preferred_solution": "Unknown",
+      "url": "",
       "solution_reference": null,
-      "interview_reference": null
+      "interview_reference": null,
+      "solution_source": null,
+      "interview_source": null
     },
     {
       "problem_dir": "Data Structures & Algorithms/duplicate-integer",
-      "category": "Arrays & Hashing",
       "problem": "Contains Duplicate",
-      "category_slug": "arrays-and-hashing",
       "problem_slug": "contains-duplicate",
-      "solution_reference": {
-        "path": "Data Structures & Algorithms/duplicate-integer/submission-9.py",
-        "number": 9,
-        "reference_type": "SOLUTION_REFERENCE",
-        "category": "Arrays & Hashing",
-        "preferred_solution": "S3",
-        "problem": "Contains Duplicate",
-        "difficulty": "Easy"
-      },
-      "interview_reference": {
-        "path": "Data Structures & Algorithms/duplicate-integer/submission-10.py",
-        "number": 10,
-        "reference_type": "INTERVIEW_REFERENCE",
-        "category": "Arrays & Hashing",
-        "preferred_solution": "S3",
-        "problem": "Contains Duplicate",
-        "difficulty": "Easy"
-      }
+      "category": "Arrays & Hashing",
+      "category_slug": "arrays-and-hashing",
+      "difficulty": "Easy",
+      "preferred_solution": "S3",
+      "url": "",
+      "solution_reference": "references/solution/arrays-and-hashing/contains-duplicate.py",
+      "interview_reference": "references/interview/arrays-and-hashing/contains-duplicate.py",
+      "solution_source": "Data Structures & Algorithms/duplicate-integer/submission-9.py",
+      "interview_source": "Data Structures & Algorithms/duplicate-integer/submission-10.py"
     }
   ]
 }

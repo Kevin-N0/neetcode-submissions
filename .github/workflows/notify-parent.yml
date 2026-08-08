@@ -5,6 +5,8 @@ on:
     branches:
       - main
 
+  workflow_dispatch:
+
 permissions:
   contents: read
 
@@ -25,17 +27,14 @@ jobs:
         run: |
           if [[ -z "${PARENT_REPOSITORY}" ]]; then
             echo "Parent sync not configured."
-            echo "Set the repository variable:"
+            echo "Set repository variable:"
             echo "  PARENT_REPOSITORY=<owner>/<repository>"
-            echo
-            echo "Example:"
-            echo "  PARENT_REPOSITORY=Kevin-N0/InterviewForge"
             exit 0
           fi
 
           if [[ -z "${GH_TOKEN}" ]]; then
             echo "Parent sync not configured."
-            echo "Set the repository secret:"
+            echo "Set repository secret:"
             echo "  SUBMODULE_UPDATE_TOKEN"
             exit 0
           fi

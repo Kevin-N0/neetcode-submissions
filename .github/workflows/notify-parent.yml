@@ -21,29 +21,44 @@ jobs:
 
     steps:
       - name: Check parent sync configuration
+        id: config
         env:
           PARENT_REPOSITORY: ${{ vars.PARENT_REPOSITORY }}
           GH_TOKEN: ${{ secrets.SUBMODULE_UPDATE_TOKEN }}
         run: |
+          CONFIGURED=true
+
           if [[ -z "${PARENT_REPOSITORY}" ]]; then
-            echo "Parent sync not configured."
-            echo "Set repository variable:"
+            echo "Parent sync is not configured."
+            echo
+            echo "Missing repository variable:"
             echo "  PARENT_REPOSITORY=<owner>/<repository>"
-            exit 0
+            echo
+            echo "Example:"
+            echo "  PARENT_REPOSITORY=Kevin-N0/InterviewForge"
+            CONFIGURED=false
           fi
 
           if [[ -z "${GH_TOKEN}" ]]; then
-            echo "Parent sync not configured."
-            echo "Set repository secret:"
+            echo "Parent sync is not configured."
+            echo
+            echo "Missing repository secret:"
             echo "  SUBMODULE_UPDATE_TOKEN"
-            exit 0
+            CONFIGURED=false
           fi
 
-          echo "Parent sync configured."
-          echo "Target repository: ${PARENT_REPOSITORY}"
+          if [[ "${CONFIGURED}" == "true" ]]; then
+            echo "Parent sync configured."
+            echo "Target repository: ${PARENT_REPOSITORY}"
+          else
+            echo
+            echo "Skipping parent notification."
+          fi
+
+          echo "configured=${CONFIGURED}" >> "${GITHUB_OUTPUT}"
 
       - name: Trigger parent submodule update
-        if: ${{ vars.PARENT_REPOSITORY != '' && secrets.SUBMODULE_UPDATE_TOKEN != '' }}
+        if: ${{ steps.config.outputs.configured == 'true' }}
         env:
           GH_TOKEN: ${{ secrets.SUBMODULE_UPDATE_TOKEN }}
           PARENT_REPOSITORY: ${{ vars.PARENT_REPOSITORY }}

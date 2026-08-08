@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "problem_count": 2,
+  "problem_count": 7,
   "problems": [
     {
-      "problem_dir": "Data Structures & Algorithms/concatenation-of-array",
-      "problem": "concatenation-of-array",
-      "problem_slug": "concatenation-of-array",
+      "problem_dir": "Data Structures & Algorithms/anagram-groups",
+      "problem": "anagram-groups",
+      "problem_slug": "anagram-groups",
       "category": "Data Structures & Algorithms",
       "category_slug": "data-structures-and-algorithms",
       "difficulty": "Unknown",
@@ -17,6 +17,20 @@
       "interview_source": null
     },
     {
+      "problem_dir": "Data Structures & Algorithms/concatenation-of-array",
+      "problem": "[Concatenation of Array]",
+      "problem_slug": "concatenation-of-array",
+      "category": "[CATEGORY_OR_UNKNOWN]",
+      "category_slug": "category-or-unknown",
+      "difficulty": "[Easy]",
+      "preferred_solution": "[S1 | S2 | S3 | S4]",
+      "url": "",
+      "solution_reference": "references/solution/category-or-unknown/concatenation-of-array.py",
+      "interview_reference": null,
+      "solution_source": "Data Structures & Algorithms/concatenation-of-array/submission-2.py",
+      "interview_source": null
+    },
+    {
       "problem_dir": "Data Structures & Algorithms/duplicate-integer",
       "problem": "Contains Duplicate",
       "problem_slug": "contains-duplicate",
@@ -24,11 +38,67 @@
       "category_slug": "arrays-and-hashing",
       "difficulty": "Easy",
       "preferred_solution": "S3",
-      "url": "",
+      "url": "https://neetcode.io/problems/duplicate-integer/question?list=neetcode250",
       "solution_reference": "references/solution/arrays-and-hashing/contains-duplicate.py",
       "interview_reference": "references/interview/arrays-and-hashing/contains-duplicate.py",
-      "solution_source": "Data Structures & Algorithms/duplicate-integer/submission-9.py",
-      "interview_source": "Data Structures & Algorithms/duplicate-integer/submission-10.py"
+      "solution_source": "Data Structures & Algorithms/duplicate-integer/submission-12.py",
+      "interview_source": "Data Structures & Algorithms/duplicate-integer/submission-11.py"
+    },
+    {
+      "problem_dir": "Data Structures & Algorithms/is-anagram",
+      "problem": "is-anagram",
+      "problem_slug": "is-anagram",
+      "category": "Data Structures & Algorithms",
+      "category_slug": "data-structures-and-algorithms",
+      "difficulty": "Unknown",
+      "preferred_solution": "Unknown",
+      "url": "",
+      "solution_reference": null,
+      "interview_reference": null,
+      "solution_source": null,
+      "interview_source": null
+    },
+    {
+      "problem_dir": "Data Structures & Algorithms/is-palindrome",
+      "problem": "is-palindrome",
+      "problem_slug": "is-palindrome",
+      "category": "Data Structures & Algorithms",
+      "category_slug": "data-structures-and-algorithms",
+      "difficulty": "Unknown",
+      "preferred_solution": "Unknown",
+      "url": "",
+      "solution_reference": null,
+      "interview_reference": null,
+      "solution_source": null,
+      "interview_source": null
+    },
+    {
+      "problem_dir": "Data Structures & Algorithms/top-k-elements-in-list",
+      "problem": "top-k-elements-in-list",
+      "problem_slug": "top-k-elements-in-list",
+      "category": "Data Structures & Algorithms",
+      "category_slug": "data-structures-and-algorithms",
+      "difficulty": "Unknown",
+      "preferred_solution": "Unknown",
+      "url": "",
+      "solution_reference": null,
+      "interview_reference": null,
+      "solution_source": null,
+      "interview_source": null
+    },
+    {
+      "problem_dir": "Data Structures & Algorithms/two-integer-sum",
+      "problem": "two-integer-sum",
+      "problem_slug": "two-integer-sum",
+      "category": "Data Structures & Algorithms",
+      "category_slug": "data-structures-and-algorithms",
+      "difficulty": "Unknown",
+      "preferred_solution": "Unknown",
+      "url": "",
+      "solution_reference": null,
+      "interview_reference": null,
+      "solution_source": null,
+      "interview_source": null
     }
   ]
 }

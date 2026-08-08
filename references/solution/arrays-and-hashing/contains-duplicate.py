@@ -14,6 +14,7 @@ class Solution:
         @PROBLEM_DETAILS_START
 
         PROBLEM: Contains Duplicate
+        URL: https://neetcode.io/problems/duplicate-integer/question?list=neetcode250
         DIFFICULTY: Easy
 
         PROBLEM DETAILS:

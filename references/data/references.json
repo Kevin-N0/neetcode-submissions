@@ -18,16 +18,16 @@
     },
     {
       "problem_dir": "Data Structures & Algorithms/concatenation-of-array",
-      "problem": "[Concatenation of Array]",
+      "problem": "Concatenation of Array",
       "problem_slug": "concatenation-of-array",
-      "category": "[CATEGORY_OR_UNKNOWN]",
-      "category_slug": "category-or-unknown",
+      "category": "Arrays & Hashing",
+      "category_slug": "arrays-and-hashing",
       "difficulty": "[Easy]",
       "preferred_solution": "[S1 | S2 | S3 | S4]",
-      "url": "",
-      "solution_reference": "references/solution/category-or-unknown/concatenation-of-array.py",
+      "url": "https://neetcode.io/problems/concatenation-of-array/solution",
+      "solution_reference": "references/solution/arrays-and-hashing/concatenation-of-array.py",
       "interview_reference": null,
-      "solution_source": "Data Structures & Algorithms/concatenation-of-array/submission-2.py",
+      "solution_source": "Data Structures & Algorithms/concatenation-of-array/submission-3.py",
       "interview_source": null
     },
     {

@@ -1,0 +1,125 @@
+name: Generate NeetCode References
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "Data Structures & Algorithms/**/submission-*.py"
+      - "prompts/solution_reference.md"
+      - "prompts/interview_reference.md"
+
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Force AI regeneration?"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: generate-neetcode-references
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout neetcode-submissions
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Determine generation scope
+        id: scope
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+          CURRENT_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          if [[ "${EVENT_NAME}" == "workflow_dispatch" ]]; then
+            echo "all=true" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          if [[ -n "${BEFORE_SHA}" ]] && [[ ! "${BEFORE_SHA}" =~ ^0+$ ]]; then
+            CHANGED="$(git diff --name-only "${BEFORE_SHA}" "${CURRENT_SHA}")"
+          else
+            CHANGED="$(git show --pretty="" --name-only HEAD)"
+          fi
+
+          printf '%s\n' "${CHANGED}"
+
+          if printf '%s\n' "${CHANGED}" | grep -qE '^prompts/(solution_reference|interview_reference)\.md$'; then
+            echo "all=true" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          {
+            echo "all=false"
+            echo "problem_dirs<<EOF"
+            printf '%s\n' "${CHANGED}" \
+              | grep -E '^Data Structures & Algorithms/.+/submission-[0-9]+\.py$' \
+              | sed 's#/submission-[0-9][0-9]*\.py$##' \
+              | sort -u
+            echo "EOF"
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Generate references for all stale problems
+        if: ${{ steps.scope.outputs.all == 'true' }}
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-3.5-flash' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ARGS=(--ai)
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]] && [[ "${{ inputs.force }}" == "true" ]]; then
+            ARGS+=(--force-ai)
+          fi
+          python build_references.py "${ARGS[@]}"
+
+      - name: Generate references for changed problems
+        if: ${{ steps.scope.outputs.all != 'true' }}
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-3.5-flash' }}
+          PROBLEM_DIRS: ${{ steps.scope.outputs.problem_dirs }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ARGS=(--ai)
+          while IFS= read -r problem_dir; do
+            [[ -z "${problem_dir}" ]] && continue
+            ARGS+=(--problem-dir "${problem_dir}")
+          done <<< "${PROBLEM_DIRS}"
+          python build_references.py "${ARGS[@]}"
+
+      - name: Commit accepted generated references
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add references
+
+          if git diff --cached --quiet; then
+            echo "No generated reference changes."
+            exit 0
+          fi
+
+          git commit -m "chore(auto): generate NeetCode references"
+          git push origin HEAD:main

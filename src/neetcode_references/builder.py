@@ -1,4 +1,4 @@
-"""Select the newest typed submissions and create a stable reference manifest."""
+"""Select reference artifacts and create a stable reference manifest."""
 
 from __future__ import annotations
 
@@ -10,6 +10,12 @@ import shutil
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
+
+from neetcode_references.ai import (
+    generate_references,
+    load_state as load_ai_state,
+    reference_metadata as ai_reference_metadata,
+)
 
 SUBMISSION_RE = re.compile(r"^submission-(\d+)\.py$", re.IGNORECASE)
 TYPE_RE = re.compile(
@@ -24,8 +30,6 @@ FIELD_PATTERNS = {
 
 @dataclass(frozen=True)
 class Candidate:
-    """One typed submission candidate."""
-
     path: Path
     number: int
     reference_type: str
@@ -86,29 +90,79 @@ def extract_docstring(source: str) -> str:
     return source
 
 
+def _existing_ai_reference(root: Path, entry: dict, key: str) -> Path | None:
+    relative = entry.get(key)
+    if not relative:
+        return None
+    path = root / relative
+    return path if path.is_file() else None
+
+
+def _metadata_from_reference(path: Path | None) -> dict[str, str]:
+    if path is None or not path.exists():
+        return {}
+    return ai_reference_metadata(read_text(path))
+
+
 def build(root: Path, *, clean: bool) -> dict:
     source_root = root / "Data Structures & Algorithms"
     references_root = root / "references"
-    if clean and references_root.exists():
-        shutil.rmtree(references_root)
     solution_root = references_root / "solution"
     interview_root = references_root / "interview"
     data_root = references_root / "data"
+
+    # v6 keeps accepted reference artifacts in their existing locations.
+    # --clean only rebuilds derived index/manifest files.
+    if clean:
+        for derived in (
+            references_root / "README.md",
+            data_root / "references.json",
+        ):
+            if derived.exists():
+                derived.unlink()
+
     data_root.mkdir(parents=True, exist_ok=True)
+    ai_state = load_ai_state(root)
 
     records: list[dict] = []
+
     for directory in problem_directories(source_root):
-        candidates = [item for path in directory.iterdir() if path.is_file() if (item := candidate(path))]
-        solution = newest(candidates, "SOLUTION_REFERENCE")
-        interview = newest(candidates, "INTERVIEW_REFERENCE")
-        representative = interview or solution
+        problem_dir = directory.relative_to(root).as_posix()
+
+        candidates = [
+            item
+            for path in directory.iterdir()
+            if path.is_file()
+            if (item := candidate(path))
+        ]
+        typed_solution = newest(candidates, "SOLUTION_REFERENCE")
+        typed_interview = newest(candidates, "INTERVIEW_REFERENCE")
+
+        ai_entry = ai_state.get("problems", {}).get(problem_dir, {})
+        ai_solution_path = _existing_ai_reference(
+            root,
+            ai_entry,
+            "solution_reference",
+        )
+        ai_interview_path = _existing_ai_reference(
+            root,
+            ai_entry,
+            "interview_reference",
+        )
+
+        ai_solution_meta = _metadata_from_reference(ai_solution_path)
+        ai_interview_meta = _metadata_from_reference(ai_interview_path)
+
         metadata: dict[str, str] = {}
         for key in ["category", "preferred_solution", "problem", "difficulty", "url"]:
             metadata[key] = (
-                (interview.metadata.get(key) if interview else "")
-                or (solution.metadata.get(key) if solution else "")
+                ai_interview_meta.get(key, "")
+                or ai_solution_meta.get(key, "")
+                or (typed_interview.metadata.get(key) if typed_interview else "")
+                or (typed_solution.metadata.get(key) if typed_solution else "")
                 or ""
             )
+
         problem = metadata.get("problem") or directory.name
         category = metadata.get("category") or directory.parent.name
         problem_slug = slugify(problem)
@@ -116,20 +170,32 @@ def build(root: Path, *, clean: bool) -> dict:
 
         solution_relative = None
         interview_relative = None
-        if solution:
+        solution_source = None
+        interview_source = None
+
+        if ai_solution_path:
+            solution_relative = ai_solution_path.relative_to(root).as_posix()
+            solution_source = ai_entry.get("source_submission")
+        elif typed_solution:
             destination = solution_root / category_slug / f"{problem_slug}.py"
             destination.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(solution.path, destination)
+            shutil.copyfile(typed_solution.path, destination)
             solution_relative = destination.relative_to(root).as_posix()
-        if interview:
+            solution_source = typed_solution.path.relative_to(root).as_posix()
+
+        if ai_interview_path:
+            interview_relative = ai_interview_path.relative_to(root).as_posix()
+            interview_source = ai_entry.get("source_submission")
+        elif typed_interview:
             destination = interview_root / category_slug / f"{problem_slug}.py"
             destination.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(interview.path, destination)
+            shutil.copyfile(typed_interview.path, destination)
             interview_relative = destination.relative_to(root).as_posix()
+            interview_source = typed_interview.path.relative_to(root).as_posix()
 
         records.append(
             {
-                "problem_dir": directory.relative_to(root).as_posix(),
+                "problem_dir": problem_dir,
                 "problem": problem,
                 "problem_slug": problem_slug,
                 "category": category,
@@ -139,23 +205,27 @@ def build(root: Path, *, clean: bool) -> dict:
                 "url": metadata.get("url") or "",
                 "solution_reference": solution_relative,
                 "interview_reference": interview_relative,
-                "solution_source": solution.path.relative_to(root).as_posix() if solution else None,
-                "interview_source": interview.path.relative_to(root).as_posix() if interview else None,
+                "solution_source": solution_source,
+                "interview_source": interview_source,
             }
         )
 
     payload = {"schema_version": 1, "problem_count": len(records), "problems": records}
     manifest = data_root / "references.json"
-    manifest.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    manifest.write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
 
     index_lines = [
         "# NeetCode References",
         "",
-        "Generated from the highest-numbered typed submission for each problem.",
+        "Generated from accepted AI references when available, with typed submissions retained as a fallback.",
         "",
         "| Problem | Category | Solution | Interview | URL |",
         "|---|---|---|---|---|",
     ]
+
     for item in sorted(records, key=lambda value: (value["category"], value["problem"])):
         solution_link = (
             f"[Open]({item['solution_reference'].removeprefix('references/')})"
@@ -165,19 +235,61 @@ def build(root: Path, *, clean: bool) -> dict:
             f"[Open]({item['interview_reference'].removeprefix('references/')})"
             if item["interview_reference"] else "Missing"
         )
-        url_link = f"[Problem]({item['url']})" if item["url"].startswith(("http://", "https://")) else "Missing"
+        url_link = (
+            f"[Problem]({item['url']})"
+            if item["url"].startswith(("http://", "https://")) else "Missing"
+        )
         index_lines.append(
             f"| {item['problem']} | {item['category']} | {solution_link} | {interview_link} | {url_link} |"
         )
-    (references_root / "README.md").write_text("\n".join(index_lines) + "\n", encoding="utf-8")
+
+    (references_root / "README.md").write_text(
+        "\n".join(index_lines) + "\n",
+        encoding="utf-8",
+    )
     return payload
 
 
 def main(root: Path | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Build typed NeetCode references.")
-    parser.add_argument("--clean", action="store_true", help="Replace previous generated references.")
+    parser = argparse.ArgumentParser(
+        description="Build typed and AI-generated NeetCode references."
+    )
+    parser.add_argument(
+        "--clean",
+        action="store_true",
+        help="Rebuild derived reference index/manifest files.",
+    )
+    parser.add_argument(
+        "--ai",
+        action="store_true",
+        help="Generate stale references with Gemini.",
+    )
+    parser.add_argument(
+        "--force-ai",
+        action="store_true",
+        help="Force AI regeneration for selected problems.",
+    )
+    parser.add_argument(
+        "--problem-dir",
+        action="append",
+        default=[],
+        help="Limit AI generation to a repository-relative problem directory. May be repeated.",
+    )
+
     args = parser.parse_args()
     repository_root = (root or Path.cwd()).resolve()
+
+    if args.force_ai and not args.ai:
+        parser.error("--force-ai requires --ai")
+
+    if args.ai:
+        report = generate_references(
+            repository_root,
+            force=args.force_ai,
+            selected_problem_dirs=args.problem_dir or None,
+        )
+        print(json.dumps({"ai_generation": report}, indent=2))
+
     payload = build(repository_root, clean=args.clean)
     complete = sum(
         bool(item["solution_reference"] and item["interview_reference"])

@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "references/**"
 
   workflow_dispatch:
 
@@ -30,18 +32,13 @@ jobs:
 
           if [[ -z "${PARENT_REPOSITORY}" ]]; then
             echo "Parent sync is not configured."
-            echo
             echo "Missing repository variable:"
             echo "  PARENT_REPOSITORY=<owner>/<repository>"
-            echo
-            echo "Example:"
-            echo "  PARENT_REPOSITORY=Kevin-N0/InterviewForge"
             CONFIGURED=false
           fi
 
           if [[ -z "${GH_TOKEN}" ]]; then
             echo "Parent sync is not configured."
-            echo
             echo "Missing repository secret:"
             echo "  SUBMODULE_UPDATE_TOKEN"
             CONFIGURED=false
@@ -51,7 +48,6 @@ jobs:
             echo "Parent sync configured."
             echo "Target repository: ${PARENT_REPOSITORY}"
           else
-            echo
             echo "Skipping parent notification."
           fi
 
@@ -63,9 +59,6 @@ jobs:
           GH_TOKEN: ${{ secrets.SUBMODULE_UPDATE_TOKEN }}
           PARENT_REPOSITORY: ${{ vars.PARENT_REPOSITORY }}
         run: |
-          echo "Triggering parent repository update..."
-          echo "Parent repository: ${PARENT_REPOSITORY}"
-
           curl \
             --fail-with-body \
             --silent \
@@ -81,6 +74,3 @@ jobs:
                 "source": "neetcode-submissions"
               }
             }'
-
-          echo
-          echo "Parent repository dispatch sent successfully."

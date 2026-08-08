@@ -1,4 +1,26 @@
+# Secrets
+.env
+
+# Python
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Generated transient data
+cards/raw-responses/
+cards/backups/
+cards/reports/*.tmp
+*.log
+
+# Operating-system files
 .DS_Store
+Thumbs.db
+
+# Local AI pacing state
+cards/state/ai-rate-limit.json
+cards/state/ai-rate-limit.json.lock
+.env.local
+.bootstrap-backups/

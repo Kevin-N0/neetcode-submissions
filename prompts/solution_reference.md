@@ -1,7 +1,5 @@
 # SOLUTION_REFERENCE Prompt
 
-Paste your complete SOLUTION_REFERENCE prompt below this line.
-
 IMPORTANT:
 - Keep this file committed to Git.
 - Do not put API keys in this file.

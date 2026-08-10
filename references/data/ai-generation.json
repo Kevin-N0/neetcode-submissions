@@ -2,14 +2,14 @@
   "problems": {
     "Data Structures & Algorithms/concatenation-of-array": {
       "generation_contract_version": 1,
-      "interview_content_hash": "8c88c844937143d60b15d45b60d5b7279666ee8072160d3e0a563997532d3454",
+      "interview_content_hash": "61f90e68a44ae08766a3f944cca004aad68ac55bdeba32b2f61b924d599eaa7a",
       "interview_contract_version": 1,
-      "interview_prompt_hash": "f35a9ca0bebff8cf0693aae2418580f5a731d11ff2e92966ee757cdc579e03b2",
+      "interview_prompt_hash": "4e76b6c6bc3d632ffd3ea7af2a72e09c55217419734cfe66e325624621bff2d6",
       "interview_reference": "references/interview/arrays-and-hashing/concatenation-of-array.py",
-      "last_problem_model_calls": 0,
+      "last_problem_model_calls": 2,
       "model": "gemini-3.5-flash",
       "problem_dir": "Data Structures & Algorithms/concatenation-of-array",
-      "solution_content_hash": "824248b3292b7435aa55b4e842d0f1f901f3ea205838ac6aff685b5a5e45777a",
+      "solution_content_hash": "cc0e212b43cc569f4562268443ccf65bd9edd04a4cfb01762be640a510a587cc",
       "solution_contract_version": 1,
       "solution_prompt_hash": "213e166af19004ca6f568b72b2c0673458a87a25814c16570aae5226e3f7d06f",
       "solution_reference": "references/solution/arrays-and-hashing/concatenation-of-array.py",
@@ -17,15 +17,15 @@
       "source_number": 10,
       "source_submission": "Data Structures & Algorithms/concatenation-of-array/submission-10.py",
       "status": "SUCCESS",
-      "validator_schema_version": 2
+      "validator_schema_version": 3
     },
     "Data Structures & Algorithms/duplicate-integer": {
       "generation_contract_version": 1,
-      "interview_content_hash": "4584167247c5e849ffbaa5e1835987778e32116fb857190fa5f0cdfe0de8800e",
+      "interview_content_hash": "50b13ea28e923b557ae6e9717933aa1bc7a17ef31e3c1a422e463809b5be7c53",
       "interview_contract_version": 1,
-      "interview_prompt_hash": "f35a9ca0bebff8cf0693aae2418580f5a731d11ff2e92966ee757cdc579e03b2",
+      "interview_prompt_hash": "4e76b6c6bc3d632ffd3ea7af2a72e09c55217419734cfe66e325624621bff2d6",
       "interview_reference": "references/interview/arrays-and-hashing/contains-duplicate.py",
-      "last_problem_model_calls": 2,
+      "last_problem_model_calls": 3,
       "model": "gemini-3.5-flash",
       "problem_dir": "Data Structures & Algorithms/duplicate-integer",
       "solution_content_hash": "d54b7951781acefc56928e19826d96dc5ec234eb2648073fa3c7657a60e42329",
@@ -36,9 +36,9 @@
       "source_number": 14,
       "source_submission": "Data Structures & Algorithms/duplicate-integer/submission-14.py",
       "status": "SUCCESS",
-      "validator_schema_version": 2
+      "validator_schema_version": 3
     }
   },
   "schema_version": 2,
-  "validator_schema_version": 2
+  "validator_schema_version": 3
 }

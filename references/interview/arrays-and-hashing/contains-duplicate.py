@@ -47,283 +47,249 @@ Constraints:
 @CONTENT_START
 
 [STEP_1_UNDERSTAND_THE_PROBLEM]
-We are given an array of integers called `nums`. Our goal is to determine if any integer appears more than once in this array. If we find any duplicate value, we should return `True`. If all elements in the array are unique, we should return `False`.
-
-The main challenge is to perform this check efficiently. Since the array can contain up to $10^5$ elements, a naive approach that compares every pair of elements will be too slow. We need a way to remember the elements we have already seen as we scan through the array.
+We are given an array of integers called nums. Our goal is to determine if there are any duplicate values in this array.
+- If any integer appears at least twice, we must return True.
+- If every single integer in the array is unique, we must return False.
+What makes this problem interesting is balancing the time spent searching for duplicates against the extra memory used to remember the numbers we have already seen.
 
 [STEP_2_RESTATE_THE_PROBLEM]
-"Given a list of numbers, I need to check if there are any duplicates. If any number appears at least twice, I will return true. If every number in the list is unique, I will return false."
+"Given an array of numbers, I need to check if there are any duplicate values. If any number appears more than once, I should return true. If every number in the array is unique, I should return false."
 
 [STEP_3_CLARIFY_AND_CONFIRM]
-- **Question**: Can the input array be empty?
-  - *Why it matters*: It determines if we need a special base case check.
-  - *What the statement establishes*: The constraints state $0 \le \text{nums.length} \le 10^5$, so an empty array is possible.
-  - *Safe assumption*: An empty array has no duplicates, so we should return `False`.
-- **Question**: Can we modify the input array?
-  - *Why it matters*: Some algorithms (like sorting) modify the input array in-place. If the caller expects the original array to remain unchanged, we would need to make a copy first, which uses extra space.
-  - *What the statement establishes*: The problem description does not forbid mutation.
-  - *Safe assumption*: We can modify it if needed, but a non-destructive approach is preferred if it achieves the same or better performance.
-- **Question**: Are there any strict memory limits?
-  - *Why it matters*: A hash set uses $O(n)$ extra space, whereas sorting in-place uses $O(1)$ auxiliary space (or $O(n)$ depending on the sorting algorithm).
-  - *What the statement establishes*: No explicit memory limits are specified.
-  - *Safe assumption*: Standard memory limits apply, and an $O(n)$ space complexity is highly acceptable to achieve optimal time complexity.
+- Question: Can the input array be empty?
+  - Why it matters: It determines if we need a special base case or if our main loop handles it naturally.
+  - What the statement establishes: The constraints state 0 <= nums.length <= 10^5, so the array can be empty. An empty array has no duplicates, so we should return False.
+- Question: Is input mutation allowed?
+  - Why it matters: If we can sort the array in-place, we can avoid using extra memory, but it modifies the caller's data.
+  - What the statement establishes: The statement does not specify whether input mutation is permitted. The preferred implementation does not mutate nums, so no mutation assumption is required.
+- Question: Are there any explicit memory limits?
+  - Why it matters: It helps us decide whether to prioritize minimizing space (like sorting) or minimizing time (like using a hash set).
+  - What the statement establishes: No explicit memory limit is provided.
 
 [STEP_4_IDENTIFY_INPUTS_OUTPUTS_AND_CONSTRAINTS]
-- **Input Type**: `nums: List[int]`
-- **Output Type**: `bool`
-- **Parameter Meaning**: `nums` is the list of integers to check for duplicates.
-- **Constraints**:
-  - $0 \le \text{nums.length} \le 10^5$
-  - $-10^9 \le \text{nums}[i] \le 10^9$
-- **Duplicate Behavior**: Any value appearing two or more times triggers a `True` return.
-- **Ordering Requirements**: The order of elements in `nums` does not matter.
-- **Mutation Behavior**: The preferred solution does not mutate the input array.
-- **No-Result Behavior**: If no duplicates exist, return `False`.
-- **Edge Cases**:
-  - Empty array `[]` -> returns `False`.
-  - Single element `[1]` -> returns `False`.
-  - Duplicates at the very beginning `[1, 1, 2, 3]` -> should return `True` quickly.
-  - Duplicates at the very end `[1, 2, 3, 3]` -> should return `True`.
-- **Complexity Variables**: Let $n$ be the length of the `nums` array.
+- Input: nums (a list of integers).
+- Output: A boolean value (True if duplicates exist, False otherwise).
+- Constraints:
+  - Array length: 0 <= nums.length <= 10^5.
+  - Element values: -10^9 <= nums[i] <= 10^9.
+- Duplicate behavior: Any value appearing more than once triggers a True return.
+- Ordering: The input array is not guaranteed to be sorted.
+- Mutation: The preferred approach does not mutate the input.
+- No-result behavior: If the array is empty or has only 1 element, it cannot contain duplicates, so we return False.
 
 [STEP_5_BASELINE_APPROACH]
-The baseline approach is a brute-force search that compares every possible pair of elements.
-
-- **Core Idea**: Check every pair of elements and return `True` if any pair contains equal values.
-- **Data Structures**: None (only loop indices).
-- **Major Execution Steps**:
-  1. Iterate through `nums` with an outer index `i` from `0` to `n - 1`.
-  2. For each `i`, start an inner loop with index `j` from `i + 1` to `n - 1`.
-  3. Compare `nums[i]` with `nums[j]`.
-  4. If they are equal, return `True` immediately.
-  5. If the loops finish without finding any duplicates, return `False`.
-- **Why it works**: Comparing every possible pair guarantees that any duplicate will eventually be found.
-- **Why it is a natural starting point**: It is the most direct implementation of the problem definition and requires no additional data structures.
-- **Main Limitation**: It is highly inefficient because it may need to examine every pair in the array, resulting in quadratic time complexity.
+The earliest meaningful documented approach is the Brute Force approach (S1).
+- Core idea: Compare every possible pair of elements in the array.
+- Data structures: None (only loop indices).
+- Major execution steps:
+  1. Use an outer loop with index i from 0 to n - 1.
+  2. Use an inner loop with index j from i + 1 to n - 1.
+  3. Compare nums[i] with nums[j].
+  4. If they are equal, return True immediately.
+  5. If both loops finish without finding a match, return False.
+- Why it works: It exhaustively checks every pair, guaranteeing that if a duplicate exists, it will be found.
+- Why it is a natural starting point: It requires no extra memory and directly implements the definition of a duplicate.
+- Main limitation: It is highly inefficient for large arrays because it performs quadratic comparisons.
 
 [STEP_6_BASELINE_COMPLEXITY]
-- **Time Complexity**: $O(n^2)$
-  - *Derivation*: In the worst case (when all elements are unique), the nested loops compare every pair of elements. The total number of comparisons is $\frac{n(n - 1)}{2}$, which simplifies to $O(n^2)$.
-- **Space Complexity**: $O(1)$
-  - *Derivation*: The algorithm only uses loop indices and a constant number of variables. No additional data structures are allocated.
+- Time Complexity: O(n^2)
+  - Let n be the number of elements in nums. In the worst case (when all elements are unique), the nested loops compare every pair of elements. The number of comparisons is n(n - 1) / 2, which simplifies to O(n^2).
+- Space Complexity: O(1)
+  - The algorithm only uses loop indices and a constant number of variables. No additional data structures are allocated.
 
 [STEP_7_FIND_THE_BOTTLENECK]
-- **Repeated or Expensive Work**: For each element at index `i`, we perform a linear scan of the remaining elements to check for a match.
-- **Why it is expensive**: Scanning the remaining elements takes $O(n)$ time. Doing this for each of the $n$ elements leads to $O(n^2)$ total operations.
-- **How often it occurs**: It occurs for every element we process until a duplicate is found or the end of the array is reached.
-- **Information that could be reused**: We do not remember the elements we have already seen. If we could store previously seen elements in a structure that allows fast lookups, we wouldn't need to scan the rest of the array.
-- **What must improve**: We need a way to check if an element has been seen before in $O(1)$ time instead of $O(n)$ time.
+The bottleneck in the brute-force approach is the repeated scanning of the array to check if the current element has appeared before.
+- For each element at index i, we scan all subsequent elements j to see if any match. This results in redundant comparisons.
+- We need a way to remember elements we have already seen in expected O(1) time, rather than scanning the rest of the array.
 
 [STEP_8_OPTIMIZATION_BRIDGE]
-- **What repeated work should be removed**: The linear scan of the remaining elements for each item.
-- **What information can be reused, stored, ordered, or discarded**: We can store the elements we have already processed.
-- **What technique/data structure enables the change**: A hash set (implemented as `set` in Python) allows us to insert and look up elements in expected $O(1)$ time.
-- **Why the change improves performance**: Instead of scanning the rest of the array for each element, we can check if the current element is already in our hash set. This reduces the lookup time from $O(n)$ to expected $O(1)$ per element.
-- **What tradeoff it introduces**: It requires $O(n)$ auxiliary space to store the elements in the hash set.
-- **Why the tradeoff is acceptable**: Trading memory for a massive speedup (from quadratic $O(n^2)$ to linear $O(n)$ time) is highly favorable, especially since $n \le 10^5$ easily fits within standard memory limits.
+To eliminate the quadratic time complexity, we need to reduce the lookup time for previously seen elements.
+- If we store the elements we have already visited in a data structure that supports fast lookups, we can check for duplicates in a single pass.
+- A hash set is ideal for this because it provides expected O(1) time complexity for both insertions and lookups.
+- Tradeoff: We trade space for time. We use O(n) auxiliary space to store the elements in the hash set, but we reduce the time complexity from O(n^2) to expected O(n).
 
 [STEP_9_PREFERRED_APPROACH]
-The preferred approach uses a hash set to track encountered values.
-
-- **Canonical Approach Name**: Hash Set
-- **Central Idea**: Use a hash set to keep track of values already encountered. While scanning `nums`, if the current value is already in the set, then that value must have appeared earlier, proving a duplicate exists.
-- **Data Structure**: Hash Set (`set` in Python).
-- **Meaning of Important Variables**:
-  - `seen`: A set storing the unique integers encountered so far.
-  - `num`: The current integer being processed from `nums`.
-- **Initialization**: Initialize `seen` as an empty set.
-- **Processing Order**: Iterate through `nums` from left to right.
-- **Important Conditions**: For each `num`, check if `num` is in `seen`.
-- **State Updates**: If `num` is in `seen`, return `True`. Otherwise, add `num` to `seen`.
-- **Early Returns**: Return `True` immediately when a duplicate is found.
-- **Termination**: If the loop finishes without finding a duplicate, return `False`.
-- **Mutation Behavior**: The input array `nums` is not modified.
-- **Main Advantage**: Expected linear-time duplicate detection.
-- **Main Tradeoff**: Requires additional memory proportional to the number of distinct values.
+The canonical preferred approach is the Hash Set approach (S3).
+- Central idea: Maintain a hash set of elements we have already seen. As we iterate through the array, we check if the current element is already in the set.
+- Variables: seen (a hash set to store visited integers).
+- Steps:
+  1. Initialize an empty hash set named seen.
+  2. Iterate through each number num in nums.
+  3. Check if num is in seen.
+  4. If it is, return True immediately (duplicate found).
+  5. If not, add num to seen.
+  6. If the loop completes without finding any duplicates, return False.
+- Mutation: Does not mutate the input array.
+- Main advantage: Expected linear time complexity O(n).
+- Main tradeoff: Requires O(n) auxiliary space.
 
 [STEP_10_CORRECTNESS_REASONING]
-- **Claim**: The algorithm correctly returns `True` if and only if there is at least one duplicate in `nums`.
-- **Why it remains true**:
-  - We maintain the invariant that `seen` contains all elements from `nums` processed so far.
-  - If we encounter an element already in `seen`, it means this element appeared earlier in the array, which is the definition of a duplicate. Thus, returning `True` is correct.
-  - If we finish the loop without finding any element already in `seen`, it means every element in `nums` was added to `seen` exactly once. Thus, all elements are unique, and returning `False` is correct.
-- **Why no valid result is missed**: We process every element in the array from start to end.
-- **Why no invalid result is returned**: We only return `True` when an element is already in `seen`, which guarantees it has appeared at least once before.
+We can prove the correctness of the hash-set approach using a loop invariant.
+An invariant is a fact that remains true throughout the algorithm.
+- Invariant: At the start of each iteration for index i, the set seen contains all elements from nums[0...i-1], and no duplicates exist in this prefix.
+- Initialization: Before the first iteration (i = 0), seen is empty. The prefix nums[0...-1] is empty, so it contains no duplicates. The invariant holds.
+- Maintenance: During the iteration for nums[i], we check if nums[i] is in seen.
+  - If nums[i] is in seen, then nums[i] appeared in nums[0...i-1]. We have found a duplicate and return True. This is correct.
+  - If nums[i] is not in seen, we add it to seen. The set now contains all elements from nums[0...i], and since we did not return True, no duplicates exist in nums[0...i]. The invariant holds for the next iteration.
+- Termination: If the loop completes, we have processed all elements without returning True. By the invariant, the entire array contains no duplicates, so returning False is correct. No valid duplicate can be missed because every element is checked against all preceding elements stored in seen.
 
 [STEP_11_EXAMPLE_TRACE]
-Custom teaching example:
-- **Input**: `nums = [1, 2, 3, 3]`
-- **Expected Output**: `True`
-- **Initial State**: `seen = set()`
-
-- **Iteration 1**:
-  - `num = 1`
-  - Is `1` in `seen`? No.
-  - Add `1` to `seen`.
-  - State: `seen = {1}`
-
-- **Iteration 2**:
-  - `num = 2`
-  - Is `2` in `seen`? No.
-  - Add `2` to `seen`.
-  - State: `seen = {1, 2}`
-
-- **Iteration 3**:
-  - `num = 3`
-  - Is `3` in `seen`? No.
-  - Add `3` to `seen`.
-  - State: `seen = {1, 2, 3}`
-
-- **Iteration 4**:
-  - `num = 3`
-  - Is `3` in `seen`? Yes.
-  - Return `True` immediately.
-
-- **Final Result**: `True`
+Custom teaching example: nums = [1, 2, 3, 2]
+- Initial state: seen = set()
+- Iteration 1: num = 1
+  - Is 1 in seen? No.
+  - Add 1 to seen.
+  - State: seen = {1}
+- Iteration 2: num = 2
+  - Is 2 in seen? No.
+  - Add 2 to seen.
+  - State: seen = {1, 2}
+- Iteration 3: num = 3
+  - Is 3 in seen? No.
+  - Add 3 to seen.
+  - State: seen = {1, 2, 3}
+- Iteration 4: num = 2
+  - Is 2 in seen? Yes.
+  - Return True immediately.
+- Final result: True
 
 [STEP_12_CODE_PLAN]
-- Initialize an empty set named `seen`.
-- Loop through each element `num` in the input list `nums`.
-- Inside the loop, check if `num` is already present in `seen`.
-- If it is, return `True` immediately.
-- If it is not, add `num` to `seen` and continue to the next element.
-- If the loop completes without finding any duplicates, return `False`.
+1. Initialize an empty set named seen.
+2. Loop through each element num in the input list nums.
+3. Inside the loop, check if num is already present in seen.
+4. If num is in seen, return True immediately.
+5. If num is not in seen, add num to seen using seen.add(num).
+6. If the loop completes without returning, return False.
 
 [STEP_13_IMPLEMENTATION]
-- **Mapping**:
-  - `seen = set()` initializes the hash set.
-  - `for num in nums:` iterates through the array.
-  - `if num in seen:` performs the $O(1)$ expected lookup.
-  - `seen.add(num)` updates the set.
-- **Readability**: The structure is concise, uses standard Python idioms, and has a clear early-exit condition.
-- **Python-Specific Behavior**: Python's `set` is implemented as a hash table, providing average $O(1)$ time complexity for both lookups (`in`) and insertions (`add`).
-- **Early Returns**: Returns `True` as soon as the first duplicate is detected, avoiding unnecessary processing of the rest of the array.
-- **Mutation Behavior**: Does not modify the input list `nums`.
+The implementation uses Python's built-in set, which is implemented as a hash table.
+- The in operator on a set has an expected time complexity of O(1).
+- The add method also has an expected time complexity of O(1).
+- This structure is highly readable and concise.
+- It returns early as soon as a duplicate is detected, which can save time in practice.
+- It does not mutate the input array.
 
 [STEP_14_TEST_CASES]
-- **Test Case 1: Representative case with duplicates**
-  - *Input*: `nums = [1, 2, 3, 3]`
-  - *Expected Output*: `True`
-  - *What it validates*: Standard duplicate detection at the end of the array.
-- **Test Case 2: Representative case with all unique elements**
-  - *Input*: `nums = [1, 2, 3, 4]`
-  - *Expected Output*: `False`
-  - *What it validates*: Correctly identifies when no duplicates exist.
-- **Test Case 3: Empty input**
-  - *Input*: `nums = []`
-  - *Expected Output*: `False`
-  - *What it validates*: Handles the minimum boundary constraint correctly.
-- **Test Case 4: Single element**
-  - *Input*: `nums = [1]`
-  - *Expected Output*: `False`
-  - *What it validates*: A single element cannot have duplicates.
-- **Test Case 5: Duplicates at the beginning**
-  - *Input*: `nums = [1, 1, 2, 3]`
-  - *Expected Output*: `True`
-  - *What it validates*: Early return works immediately on the second element.
+- Test Case 1 (Representative Case with Duplicate):
+  - Input: nums = [1, 2, 3, 3]
+  - Expected Output: True
+  - Validation: Validates that a duplicate at the end of the array is correctly identified.
+- Test Case 2 (Representative Case without Duplicate):
+  - Input: nums = [1, 2, 3, 4]
+  - Expected Output: False
+  - Validation: Validates that an array with all unique elements returns False.
+- Test Case 3 (Empty Input):
+  - Input: nums = []
+  - Expected Output: False
+  - Validation: Validates the boundary case of an empty array.
+- Test Case 4 (Single Element):
+  - Input: nums = [1]
+  - Expected Output: False
+  - Validation: Validates that a single-element array cannot have duplicates.
+- Test Case 5 (All Duplicates):
+  - Input: nums = [5, 5, 5]
+  - Expected Output: True
+  - Validation: Validates that multiple duplicates are handled correctly and returns early on the first duplicate.
 
 [STEP_15_TIME_COMPLEXITY_DERIVATION]
-- **Variables**: Let $n$ be the number of elements in `nums`.
-- **Implementation Phases**:
-  - Initialization: `seen = set()` takes $O(1)$ time.
-  - Iteration: We loop through `nums` at most once, processing each element.
-- **Operation Counts and Costs**:
-  - For each of the $n$ elements, we perform a lookup (`num in seen`) and potentially an insertion (`seen.add(num)`).
-  - In Python, hash set lookups and insertions take expected $O(1)$ time.
-- **How Costs Combine**: $n \times O(1) = O(n)$.
-- **Simplification**: The overall time complexity is dominated by the loop, which is expected $O(n)$.
-- **Qualification**: Expected linear time. In extremely rare pathological cases with severe hash collisions, lookups could degrade to $O(n)$, making the worst-case time $O(n^2)$, but in practice, it is $O(n)$.
-- **Final Canonical Complexity**: `TIME: O(n)`
+Let n be the number of elements in nums.
+1. We initialize the hash set seen, which takes O(1) time.
+2. We iterate through the array nums of size n.
+3. In each iteration, we perform:
+   - A membership check: num in seen
+   - An insertion: seen.add(num)
+4. For Python's built-in set (which is implemented as a hash table), both membership checks and insertions have an expected time complexity of O(1).
+5. In the worst case, we perform these operations n times.
+6. Therefore, the expected total time complexity is O(n).
+7. In highly rare pathological cases with extreme hash collisions, set operations can degrade to O(n) worst-case, making the total time O(n^2). However, in practice, the expected time complexity is O(n).
+- Final canonical time complexity: O(n)
 
 [STEP_16_SPACE_COMPLEXITY_DERIVATION]
-- **Fixed-Size Variables**: Loop variable `num` takes $O(1)$ space.
-- **Growing Structures**: The `seen` set grows as we encounter unique elements.
-- **Maximum Sizes**: In the worst case (all elements are unique), the set will store all $n$ elements.
-- **Recursion Depth**: No recursion is used, so stack space is $O(1)$.
-- **Temporary Storage**: No other temporary copies or slices are created.
-- **Output-Space Treatment**: The output is a single boolean, which takes $O(1)$ space.
-- **Mutation Behavior**: The input array is not mutated.
-- **Final Auxiliary Complexity**: `SPACE: O(n)`
-- **Headline Space Complexity**: `SPACE: O(n)`
+Let n be the number of elements in nums.
+1. The algorithm allocates a hash set seen to store visited elements.
+2. In the worst case, all elements in nums are unique.
+3. In this case, the set seen will grow to store all n elements.
+4. Each element stored in the set requires O(1) auxiliary space.
+5. Therefore, the maximum auxiliary space used by the set is O(n).
+6. No other growing data structures or recursive call stacks are used.
+- Final canonical space complexity: O(n)
 
 [STEP_17_APPROACH_TRADEOFFS]
-- **S1 - Brute Force**:
-  - *Time*: $O(n^2)$
-  - *Space*: $O(1)$
-  - *Advantage*: No extra memory required, very simple.
-  - *Disadvantage*: Extremely slow for large inputs.
-- **S2 - Sorting**:
-  - *Time*: $O(n \log n)$
-  - *Space*: $O(n)$ (due to Timsort's temporary storage in Python)
-  - *Advantage*: Avoids the $O(n^2)$ bottleneck without needing a hash set.
-  - *Disadvantage*: Modifies the input array (or requires extra space to copy it) and is slower than the hash set approach.
-- **S3 - Hash Set (Preferred)**:
-  - *Time*: $O(n)$
-  - *Space*: $O(n)$
-  - *Advantage*: Fastest expected runtime (linear time).
-  - *Disadvantage*: Requires extra memory proportional to the number of unique elements.
-
-**Why the preferred approach is chosen**:
-The hash set approach provides the optimal time complexity of $O(n)$ by trading a reasonable amount of memory ($O(n)$ space). In most interview scenarios, optimizing time complexity is prioritized over space complexity, making S3 the best choice.
+We compare the three documented approaches:
+- S1 (Brute Force):
+  - Time: O(n^2)
+  - Space: O(1)
+  - Advantage: No extra memory required.
+  - Disadvantage: Extremely slow for large inputs.
+- S2 (Sorting):
+  - Time: O(n log n)
+  - Space: O(n) (due to Python's Timsort worst-case space complexity).
+  - Advantage: Simple adjacent scan after sorting.
+  - Disadvantage: Modifies the input array and is slower than the hash-set approach.
+- S3 (Hash Set - Preferred):
+  - Time: O(n) (expected)
+  - Space: O(n)
+  - Advantage: Expected time complexity of O(n), which is lower than S1 and S2. Does not modify the input.
+  - Disadvantage: Requires extra memory proportional to the number of unique elements.
+Why S3 is preferred: It provides an expected time complexity of O(n) and does not modify the input array, which avoids side effects.
 
 [STEP_18_INTERVIEW_COMMUNICATION]
-- **Before Coding**:
+- Before Coding:
   - Restate the problem to ensure alignment.
-  - Confirm constraints (e.g., empty array behavior, memory limits).
-  - Mention the brute-force $O(n^2)$ approach briefly to establish a baseline.
-  - Propose the $O(n)$ hash set approach as the optimal solution.
-- **While Coding**:
-  - Explain the purpose of the `seen` set.
-  - Explain why the lookup `num in seen` is efficient ($O(1)$ expected time).
-  - Write clean, readable code with proper indentation.
-- **After Coding**:
-  - Walk through a simple test case to verify correctness.
-  - State and derive the time and space complexities clearly.
-  - Discuss the tradeoffs (e.g., time vs. space compared to sorting).
+  - Clarify constraints (e.g., empty array, mutation permission).
+  - Mention the brute-force approach (O(n^2) time, O(1) space) and explain its bottleneck (repeated scanning).
+  - Propose the hash-set approach to optimize the lookup time to expected O(1), resulting in O(n) time and O(n) space.
+- While Coding:
+  - Explain the purpose of the seen set.
+  - Explain the early return condition (if num in seen).
+  - Explain why we add the element to the set only after checking.
+- After Coding:
+  - Trace the code with a simple example.
+  - State the time complexity (O(n)) and space complexity (O(n)).
+  - Discuss the tradeoff between the sorting approach (which modifies input) and the hash-set approach.
 
 [INTERVIEW_SCRIPT]
-"To solve this problem, I'll start by restating it: we want to find if any integer in the array `nums` appears more than once.
+"To solve this problem, I'll start by restating it: we want to find if any integer in the array appears more than once. If it does, we return true; otherwise, we return false.
 
-A simple brute-force approach would be to compare every pair of elements using nested loops. This would take $O(n^2)$ time and $O(1)$ space. We can do much better.
+A simple brute-force approach would be to compare every pair of elements using nested loops. This would take O(n^2) time and O(1) space. However, the bottleneck is that we are repeatedly scanning the array to check for duplicates.
 
-Another option is to sort the array first, which takes $O(n \log n)$ time, and then check adjacent elements. This is better but still not optimal.
+We can optimize this by using a hash set to keep track of the numbers we have already seen. As we iterate through the array, we can check if the current number is already in our set in expected O(1) time. If it is, we immediately return true. If we finish the loop without finding any duplicates, we return false.
 
-The most efficient approach is to use a hash set to keep track of the numbers we've already seen. As we iterate through the array, we check if the current number is already in our set. If it is, we've found a duplicate and can return `True` immediately. If we finish the loop without finding any duplicates, we return `False`.
-
-This hash set approach runs in expected $O(n)$ time because set lookups and insertions are $O(1)$ on average. It uses $O(n)$ auxiliary space to store the elements in the set.
+This approach improves the time complexity to expected O(n), while requiring O(n) auxiliary space to store the elements in the set.
 
 Let's write the code for this."
 
 [PATTERN_RECOGNITION]
-- **Main Pattern**: Using a Hash Set for tracking seen elements.
-- **Statement Signals**: "return true if any value appears more than once", "find duplicates", "check if an element has been seen before".
-- **Why those signals suggest the technique**: A hash set provides $O(1)$ average-time lookups, making it the perfect tool for checking membership or existence of previously processed elements.
-- **Common Relevant Data Structures**: Hash Set (`set`), Hash Map (`dict`).
-- **Common Variations**: Finding the first duplicate, counting frequencies of elements, finding all duplicates.
-- **False-Positive Signals**: If the problem requires finding duplicates within a specific distance (e.g., Contains Duplicate II), a simple set is not enough; we need a sliding window or a hash map to store indices. If we cannot use extra space at all, we must use sorting or in-place modification.
+- Main pattern: Using a Hash Set for tracking visited elements.
+- Signals:
+  - "Find duplicates", "Check if an element has appeared before", "Find the first repeating element".
+  - Any problem where you need to check membership or frequency of elements in a collection with fast lookups.
+- Common variations:
+  - Two Sum (using a hash map to find the complement).
+  - First Unique Character in a String (using a hash map to count frequencies).
+- False-positive signals:
+  - If the input array is already sorted, we don't need a hash set; we can just compare adjacent elements in O(1) space.
+  - If the elements are bounded in a very small range (e.g., 1 to n), we might be able to use the array itself as a hash map (in-place marking) to achieve O(1) auxiliary space, though that mutates the input.
 
 [COMMON_PITFALLS]
-- Adding the element to the set before checking if it is already present (this would make the check always return `True`).
-- Returning `False` inside the loop too early (before checking all elements).
-- Assuming hash set operations are guaranteed $O(1)$ in the worst case (they are expected $O(1)$ due to potential hash collisions).
-- Forgetting that sorting-based approaches modify the input array, which might be an undesired side effect.
+- Adding the current element to the set before checking if it is already in the set (this would cause the check to always return True).
+- Returning False inside the loop instead of after the loop finishes.
+- Assuming hash set operations are guaranteed O(1) worst-case instead of expected O(1).
+- Forgetting that sorting the array in-place (like nums.sort()) mutates the input, which might not be allowed or expected.
 
 [FINAL_REVIEW_CHECKLIST]
-- Can I restate the problem?
-- Do I know the input, output, and constraints?
-- Do I know what actually needs clarification?
-- Can I explain the documented baseline or simplest supported starting point?
-- Can I identify its bottleneck or main performance consideration?
-- Can I explain how that leads to the preferred approach?
-- Can I explain why the preferred approach works?
-- Can I explain important variables and update order?
-- Can I trace a small example?
-- Can I identify important edge cases?
-- Can I derive time complexity?
-- Can I derive auxiliary space?
-- Can I state the main tradeoff?
-- Can I communicate the solution naturally before coding?
-- Can I implement it without copying?
+1. Can I restate the problem clearly?
+2. Do I know the input, output, and constraints?
+3. Did I clarify if the input array can be empty?
+4. Can I explain the brute-force baseline and its O(n^2) bottleneck?
+5. Can I explain how a hash set optimizes the lookup time?
+6. Can I explain why the hash-set approach is correct using a loop invariant?
+7. Can I trace a small example step-by-step?
+8. Did I handle the empty array edge case correctly?
+9. Can I derive the expected O(n) time complexity?
+10. Can I derive the O(n) space complexity?
+11. Can I discuss the tradeoffs between the hash-set and sorting approaches?
+12. Can I communicate my thought process clearly before writing code?
 
 @CONTENT_END
 

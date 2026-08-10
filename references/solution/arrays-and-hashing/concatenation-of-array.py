@@ -37,7 +37,6 @@ class Solution:
         [1, 2, 1, 1, 2, 1]
 
         Explanation:
-
         The result is formed by placing nums immediately after itself.
 
         Example 2:
@@ -49,7 +48,6 @@ class Solution:
         [1, 3, 2, 1, 1, 3, 2, 1]
 
         Constraints:
-
         - nums contains integers.
         - The returned array must contain the original sequence twice,
           in the same order.
@@ -70,10 +68,11 @@ class Solution:
         4. Return the completed result list.
 
         TIME: O(n)
-        We traverse all n elements twice. The total work is O(n) + O(n) = O(2n) = O(n).
+        We traverse all n elements twice. The total work is O(n) + O(n) = O(n), where n is the length of the input array nums.
 
-        SPACE: O(n)
-        The returned result contains 2n elements. Auxiliary working space outside the required output is O(1), but the constructed result itself requires O(n) space.
+        SPACE: O(1)
+        Auxiliary space is O(1) as we only use a few loop variables. The output array itself takes O(n) space to store 2n elements.
+
 
         [S2]-[Iteration - Preallocated Output]
 
@@ -89,28 +88,30 @@ class Solution:
         6. Return ans.
 
         TIME: O(n)
-        The loop processes each of the n input elements exactly once. Each iteration performs constant-time assignments. Therefore the total time complexity is O(n).
+        The loop processes each of the n input elements exactly once. Each iteration performs constant-time assignments. Therefore, the total time complexity is O(n), where n is the length of the input array nums.
 
-        SPACE: O(n)
-        The returned result contains 2n elements. Auxiliary working space besides the required output is O(1), while the output itself requires O(n) space.
+        SPACE: O(1)
+        Auxiliary space is O(1) as we only use a few loop variables. The output array itself takes O(n) space to store 2n elements.
+
 
         [APPROACH_COMPARISON]
 
-        - Approach: S1
+        - Approach: S1 - Iteration - Two Pass
           Time: O(n)
-          Time qualification: Processes each element twice
-          Space: O(n)
+          Time qualification: n is the length of nums
+          Space: O(1)
           Input modified: No
-          Main advantage: Very simple and easy to understand
-          Main disadvantage: Performs two explicit passes through nums
+          Main advantage: Very simple and easy to understand.
+          Main disadvantage: Performs two explicit passes through nums.
 
-        - Approach: S2
+        - Approach: S2 - Iteration - Preallocated Output
           Time: O(n)
-          Time qualification: Processes each element once
-          Space: O(n)
+          Time qualification: n is the length of nums
+          Space: O(1)
           Input modified: No
-          Main advantage: Uses one traversal and directly writes each value to its two final positions
-          Main disadvantage: Requires managing indices and preallocating the exact output size
+          Main advantage: Uses one traversal and directly writes each value to its two final positions.
+          Main disadvantage: Requires managing indices and preallocating the exact output size.
+
 
         [COMMON_PITFALLS]
 
@@ -125,6 +126,7 @@ class Solution:
         @NC250_END
         """
 
+        # S2 is the preferred solution
         n = len(nums)
         ans = [0] * (2 * n)
 

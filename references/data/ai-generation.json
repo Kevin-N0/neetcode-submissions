@@ -18,6 +18,25 @@
       "source_submission": "Data Structures & Algorithms/concatenation-of-array/submission-10.py",
       "status": "SUCCESS",
       "validator_schema_version": 2
+    },
+    "Data Structures & Algorithms/duplicate-integer": {
+      "generation_contract_version": 1,
+      "interview_content_hash": "6fac2a1e9b82023857f1d23cc265eea26d4c484c93054cf9f1255b9d3c7b48e5",
+      "interview_contract_version": 1,
+      "interview_prompt_hash": "f35a9ca0bebff8cf0693aae2418580f5a731d11ff2e92966ee757cdc579e03b2",
+      "interview_reference": "references/interview/arrays-and-hashing/contains-duplicate.py",
+      "last_problem_model_calls": 2,
+      "model": "gemini-3.5-flash",
+      "problem_dir": "Data Structures & Algorithms/duplicate-integer",
+      "solution_content_hash": "61d05099ea6099033e0c5d329cc79311fd6bb548a88953e8259dc9004044b1fd",
+      "solution_contract_version": 1,
+      "solution_prompt_hash": "213e166af19004ca6f568b72b2c0673458a87a25814c16570aae5226e3f7d06f",
+      "solution_reference": "references/solution/arrays-and-hashing/contains-duplicate.py",
+      "source_hash": "fb16ddaf86c1b6ebeb508017d21fc70d2f14520dd86f603b5f9fd5a98f98ccf4",
+      "source_number": 13,
+      "source_submission": "Data Structures & Algorithms/duplicate-integer/submission-13.py",
+      "status": "SUCCESS",
+      "validator_schema_version": 2
     }
   },
   "schema_version": 2,

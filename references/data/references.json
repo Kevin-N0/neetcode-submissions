@@ -41,8 +41,8 @@
       "url": "https://neetcode.io/problems/duplicate-integer/question?list=neetcode250",
       "solution_reference": "references/solution/arrays-and-hashing/contains-duplicate.py",
       "interview_reference": "references/interview/arrays-and-hashing/contains-duplicate.py",
-      "solution_source": "Data Structures & Algorithms/duplicate-integer/submission-12.py",
-      "interview_source": "Data Structures & Algorithms/duplicate-integer/submission-11.py"
+      "solution_source": "Data Structures & Algorithms/duplicate-integer/submission-13.py",
+      "interview_source": "Data Structures & Algorithms/duplicate-integer/submission-13.py"
     },
     {
       "problem_dir": "Data Structures & Algorithms/is-anagram",

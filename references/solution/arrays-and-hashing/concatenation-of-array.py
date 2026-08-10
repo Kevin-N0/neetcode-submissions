@@ -1,237 +1,142 @@
-class Solution:
-    def getConcatenation(self, nums:List[int]) -> List[int]: 
+from typing import List
 
-      """
+
+class Solution:
+    def getConcatenation(self, nums: List[int]) -> List[int]:
+        """
         @NC250_START
+
         TYPE: SOLUTION_REFERENCE
         SCHEMA_VERSION: 1
-
         CATEGORY: Arrays & Hashing
-        PREFERRED_SOLUTION: [S1 | S2 | S3 | S4]
+        PREFERRED_SOLUTION: S2
 
         @PROBLEM_DETAILS_START
 
         PROBLEM: Concatenation of Array
-]
         URL: https://neetcode.io/problems/concatenation-of-array/solution
-        DIFFICULTY: [Easy]
-
+        DIFFICULTY: Easy
         PROBLEM DETAILS:
 
-        You are given an integer array nums of length n. Create an array ans of length 2n where ans[i] == nums[i] and ans[i + n] == nums[i] for 0 <= i < n (0-indexed).
+        Given an integer array nums of length n, create an array ans of
+        length 2n where:
 
-Specifically, ans is the concatenation of two nums arrays.
+        - ans[i] == nums[i]
+        - ans[i + n] == nums[i]
 
-Return the array ans.
+        for 0 <= i < n.
 
-Example 1:
+        In other words, ans is the concatenation of nums with itself.
 
-Input: nums = [1,4,1,2]
+        Example 1:
 
-Output: [1,4,1,2,1,4,1,2]
-Example 2:
+        Input:
+        nums = [1, 2, 1]
 
-Input: nums = [22,21,20,1]
+        Output:
+        [1, 2, 1, 1, 2, 1]
 
-Output: [22,21,20,1,22,21,20,1]
-Constraints:
+        Explanation:
 
-1 <= nums.length <= 1000.
-1 <= nums[i] <= 1000
+        The result is formed by placing nums immediately after itself.
+
+        Example 2:
+
+        Input:
+        nums = [1, 3, 2, 1]
+
+        Output:
+        [1, 3, 2, 1, 1, 3, 2, 1]
+
+        Constraints:
+
+        - nums contains integers.
+        - The returned array must contain the original sequence twice,
+          in the same order.
 
         @PROBLEM_DETAILS_END
+
         @CONTENT_START
 
-
-        [S1]-Iteration (Two Pass)
+        [S1]-[Iteration - Two Pass]
 
         INT:
-        To concatenate an array with itself, we
-need to create a new array that contains
-all elements of the original array twice,
-maintaining the same order. The
-elements at indices 0 to n — 1 are
-followed by the same elements at
-indices n to 2n — 1.
-For example, if nums = [1, 2, 3] :
-• The first three elements of ans will
-be nums [0] , nums [1] , nums [2]
-> 11, 2, 3]
-• The next three elements of ans will
-also be nums [0], nums [1],
-nums [2] -> [1, 2, 3]
-• Result: [1, 2, 3, 1, 2, 3]
-
+        Build a new result list by iterating through nums twice. During the first pass, append every value from nums. During the second pass, append every value again. This directly creates nums followed by nums.
 
         ALGO:
-        Initialize an empty result list or an array ans of size 2n, where n is the length of the input array.
-Use a loop that runs twice.
-Inside that loop, iterate through every element num in the input array nums.
-Append num to the result list or assign it to the next available index in the result array.
-Return the resulting array.
+        1. Create an empty result list.
+        2. Repeat the traversal of nums two times.
+        3. During each traversal, append every element to the result list.
+        4. Return the completed result list.
 
+        TIME: O(n)
+        We traverse all n elements twice. The total work is O(n) + O(n) = O(2n) = O(n).
 
+        SPACE: O(n)
+        The returned result contains 2n elements. Auxiliary working space outside the required output is O(1), but the constructed result itself requires O(n) space.
 
-        TIME: O(...)
+        [S2]-[Iteration - Preallocated Output]
 
-
-        Time complexity: O(n) where n is
-the length of the input array. We
-iterate through the array twice,
-performing 2n operations.
-Space complexity: O(n) if we
-consider the space required for the
-output array of size 2n.
-
-        1. Let n be [DEFINE THE MAIN INPUT-SIZE VARIABLE].
-        2. Let m, k, h, V, E, or another variable be
-           [DEFINE ONLY IF NEEDED].
-        3. The main operation or operations are [IDENTIFY THE WORK].
-        4. These operations occur [STATE HOW MANY TIMES].
-        5. Each operation costs [STATE THE COST].
-        6. The costs are [NESTED, SEQUENTIAL, RECURSIVE, OR OTHERWISE
-           COMBINED], so they are [MULTIPLIED, ADDED, OR EXPRESSED WITH
-           A RECURRENCE].
-        7. After simplifying, the dominant term is O(...).
-        8. Therefore, the [worst-case | expected | average-case | amortized |
-           best-case] time complexity is O(...).
-
-        SPACE: O(...)
-
-        1. The algorithm uses [IDENTIFY VARIABLES AND EXTRA DATA STRUCTURES].
-        2. The largest growing structure can contain [STATE THE MAXIMUM SIZE].
-        3. Additional storage such as copied input, sorting storage,
-           memoization, visited state, queues, stacks, heaps, or tables uses
-           [O(...) | Not applicable].
-        4. The recursion stack uses [O(...) | Not applicable].
-        5. The remaining fixed variables use O(1) space.
-        6. Required output space is [O(...) | excluded | Not applicable].
-        7. The input is [modified | not modified].
-        8. Therefore, the auxiliary-space complexity is O(...).
-
-
-        [S2]-Iteration (One Pass)
-
-The problem defines the result array
-ans such that ans [i] == nums [il
-and ans [i + n] == nums[il for 0 <=
-i < n. Instead of looping through the
-input twice, we can fill both required
-positions in the result array
-simultaneously while iterating through
-the input array just once. This utilizes
-the index mapping i and i + n
-directly.
+        INT:
+        Since the final result always has exactly 2n elements, allocate the full output list immediately. For every nums[i], place the value in two positions: ans[i] and ans[i + n]. This fills both copies of nums during a single traversal.
 
         ALGO:
-1. Determine the length n of the input
-array.
-2. Initialize a result array ans of size
-2n.
-3. Iterate through the input array
-nums using an index i from 0 to
-n - 1.
-4. For each element at index i :
+        1. Let n be the length of nums.
+        2. Allocate ans with length 2n.
+        3. Iterate through nums with both index i and value num.
+        4. Store num at ans[i].
+        5. Store the same num at ans[i + n].
+        6. Return ans.
 
-• Set ans [i] = nums [il .
-• Set ans [i + n] = nums[il .
+        TIME: O(n)
+        The loop processes each of the n input elements exactly once. Each iteration performs constant-time assignments. Therefore the total time complexity is O(n).
 
-5. Return the resulting array.
-
-        TIME: O(...)
-• Time complexity: O(n) where n is
-the length of the input array.
-Although we iterate through the
-input once, we still perform 2n total
-writes to the output array.
-• Space complexity: O(n) as we must
-allocate an array of size 2n for the
-output.
-
-
+        SPACE: O(n)
+        The returned result contains 2n elements. Auxiliary working space besides the required output is O(1), while the output itself requires O(n) space.
 
         [APPROACH_COMPARISON]
 
-        S1:
-        - Approach:
-        - Time:
-        - Time qualification:
-        - Space:
-        - Input modified: [Yes | No]
-        - Main advantage:
-        - Main disadvantage:
+        - Approach: S1
+          Time: O(n)
+          Time qualification: Processes each element twice
+          Space: O(n)
+          Input modified: No
+          Main advantage: Very simple and easy to understand
+          Main disadvantage: Performs two explicit passes through nums
 
-        S2:
-        - Approach:
-        - Time:
-        - Time qualification:
-        - Space:
-        - Input modified: [Yes | No]
-        - Main advantage:
-        - Main disadvantage:
-
-        S3:
-        - Approach:
-        - Time:
-        - Time qualification:
-        - Space:
-        - Input modified: [Yes | No]
-        - Main advantage:
-        - Main disadvantage:
-
-        S4:
-        - Approach:
-        - Time:
-        - Time qualification:
-        - Space:
-        - Input modified: [Yes | No]
-        - Main advantage:
-        - Main disadvantage:
-
+        - Approach: S2
+          Time: O(n)
+          Time qualification: Processes each element once
+          Space: O(n)
+          Input modified: No
+          Main advantage: Uses one traversal and directly writes each value to its two final positions
+          Main disadvantage: Requires managing indices and preallocating the exact output size
 
         [COMMON_PITFALLS]
 
-Incorrect Result Array
-Size
-Allocating an array of size n instead of
-2n causes an index out of bounds error
-when writing to the second half.
+        - Forgetting that the result must preserve the original order twice.
+        - Writing to ans[i + n] with an incorrect offset.
+        - Allocating only n output positions instead of 2n.
+        - Confusing required output space with auxiliary space.
+        - Accidentally modifying nums when the problem only requires returning a new array.
 
-Off-by-One When Using
-Index Offset
-When using the one-pass approach with
-ans li + n] = nums [il, forgetting that
-indices are zero-based or miscalculating
-the offset leads to incorrect placement
-of elements in the second half.
+        @CONTENT_END
 
+        @NC250_END
+        """
 
-      @CONTENT_END
-      @NC250_END
-      """
+        n = len(nums)
+        ans = [0] * (2 * n)
 
+        for i, num in enumerate(nums):
+            ans[i] = num
+            ans[i + n] = num
 
-      # S1 CODE - Iteration (Two Pass):
-      # ans = []
-      # for i in range(2): 
-      #    for num in nums: 
-      #       ans.append(num)
-      # return ans
+        return ans
 
-      # S2 CODE - Iteration (One Pass)
-      n = len(nums)
-      ans = [0] * (2 * n)
-      for i, num in enumerate(nums): 
-         ans[i] = ans[i + n] = num
-      return ans
-
-
-
-        # Leave only the preferred solution uncommented and executable.
-
-
-
-
-
-
- 
+        # S1 CODE - Iteration (Two Pass)
+        # ans = []
+        # for _ in range(2):
+        #     for num in nums:
+        #         ans.append(num)
+        # return ans

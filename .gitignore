@@ -24,3 +24,12 @@ cards/state/ai-rate-limit.json
 cards/state/ai-rate-limit.json.lock
 .env.local
 .bootstrap-backups/
+
+# NC-250 AI local diagnostics
+references/data/ai-failures/
+
+# Bootstrap backups
+.bootstrap-backups/
+
+# Local environment secrets
+.env

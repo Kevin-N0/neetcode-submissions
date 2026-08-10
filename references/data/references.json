@@ -22,13 +22,13 @@
       "problem_slug": "concatenation-of-array",
       "category": "Arrays & Hashing",
       "category_slug": "arrays-and-hashing",
-      "difficulty": "[Easy]",
-      "preferred_solution": "[S1 | S2 | S3 | S4]",
+      "difficulty": "Easy",
+      "preferred_solution": "S2",
       "url": "https://neetcode.io/problems/concatenation-of-array/solution",
       "solution_reference": "references/solution/arrays-and-hashing/concatenation-of-array.py",
-      "interview_reference": null,
-      "solution_source": "Data Structures & Algorithms/concatenation-of-array/submission-3.py",
-      "interview_source": null
+      "interview_reference": "references/interview/arrays-and-hashing/concatenation-of-array.py",
+      "solution_source": "Data Structures & Algorithms/concatenation-of-array/submission-10.py",
+      "interview_source": "Data Structures & Algorithms/concatenation-of-array/submission-10.py"
     },
     {
       "problem_dir": "Data Structures & Algorithms/duplicate-integer",

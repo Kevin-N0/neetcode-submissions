@@ -1,0 +1,25 @@
+{
+  "problems": {
+    "Data Structures & Algorithms/concatenation-of-array": {
+      "generation_contract_version": 1,
+      "interview_content_hash": "8c88c844937143d60b15d45b60d5b7279666ee8072160d3e0a563997532d3454",
+      "interview_contract_version": 1,
+      "interview_prompt_hash": "f35a9ca0bebff8cf0693aae2418580f5a731d11ff2e92966ee757cdc579e03b2",
+      "interview_reference": "references/interview/arrays-and-hashing/concatenation-of-array.py",
+      "last_problem_model_calls": 0,
+      "model": "gemini-3.5-flash",
+      "problem_dir": "Data Structures & Algorithms/concatenation-of-array",
+      "solution_content_hash": "824248b3292b7435aa55b4e842d0f1f901f3ea205838ac6aff685b5a5e45777a",
+      "solution_contract_version": 1,
+      "solution_prompt_hash": "213e166af19004ca6f568b72b2c0673458a87a25814c16570aae5226e3f7d06f",
+      "solution_reference": "references/solution/arrays-and-hashing/concatenation-of-array.py",
+      "source_hash": "7f569819e7fa655d6209932e82e802714572f3ee18859edecc35048b90b2727b",
+      "source_number": 10,
+      "source_submission": "Data Structures & Algorithms/concatenation-of-array/submission-10.py",
+      "status": "SUCCESS",
+      "validator_schema_version": 2
+    }
+  },
+  "schema_version": 2,
+  "validator_schema_version": 2
+}

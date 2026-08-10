@@ -1,10 +1,10 @@
 # NeetCode References
 
-Generated from the highest-numbered typed submission for each problem.
+Generated from accepted AI references when available, with typed submissions retained as a fallback.
 
 | Problem | Category | Solution | Interview | URL |
 |---|---|---|---|---|
-| Concatenation of Array | Arrays & Hashing | [Open](solution/arrays-and-hashing/concatenation-of-array.py) | Missing | [Problem](https://neetcode.io/problems/concatenation-of-array/solution) |
+| Concatenation of Array | Arrays & Hashing | [Open](solution/arrays-and-hashing/concatenation-of-array.py) | [Open](interview/arrays-and-hashing/concatenation-of-array.py) | [Problem](https://neetcode.io/problems/concatenation-of-array/solution) |
 | Contains Duplicate | Arrays & Hashing | [Open](solution/arrays-and-hashing/contains-duplicate.py) | [Open](interview/arrays-and-hashing/contains-duplicate.py) | [Problem](https://neetcode.io/problems/duplicate-integer/question?list=neetcode250) |
 | anagram-groups | Data Structures & Algorithms | Missing | Missing | Missing |
 | is-anagram | Data Structures & Algorithms | Missing | Missing | Missing |

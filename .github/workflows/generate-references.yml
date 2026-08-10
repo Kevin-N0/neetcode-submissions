@@ -1,125 +1,325 @@
-name: Generate NeetCode References
+name: Generate NC-250 References
 
 on:
+  workflow_dispatch:
+
   push:
     branches:
       - main
     paths:
       - "Data Structures & Algorithms/**/submission-*.py"
-      - "prompts/solution_reference.md"
-      - "prompts/interview_reference.md"
-
-  workflow_dispatch:
-    inputs:
-      force:
-        description: "Force AI regeneration?"
-        required: false
-        default: false
-        type: boolean
+      - "prompts/**"
+      - "src/neetcode_references/**"
+      - "build_references.py"
 
 permissions:
   contents: write
 
 concurrency:
-  group: generate-neetcode-references
+  group: nc250-reference-generation
   cancel-in-progress: false
 
 jobs:
   generate:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
 
     steps:
-      - name: Checkout neetcode-submissions
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.13"
+
+      - name: Run tests
+        env:
+          PYTHONPATH: src
+        run: python -m pytest -q
 
       - name: Determine generation scope
-        id: scope
+        id: changed
         shell: bash
         env:
           EVENT_NAME: ${{ github.event_name }}
-          BEFORE_SHA: ${{ github.event.before }}
+          EVENT_BEFORE: ${{ github.event.before }}
           CURRENT_SHA: ${{ github.sha }}
         run: |
-          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          import subprocess
+          from pathlib import Path
 
-          if [[ "${EVENT_NAME}" == "workflow_dispatch" ]]; then
-            echo "all=true" >> "${GITHUB_OUTPUT}"
-            exit 0
-          fi
+          event_name = os.environ["EVENT_NAME"]
+          event_before = os.environ.get("EVENT_BEFORE", "")
+          current = os.environ["CURRENT_SHA"]
 
-          if [[ -n "${BEFORE_SHA}" ]] && [[ ! "${BEFORE_SHA}" =~ ^0+$ ]]; then
-            CHANGED="$(git diff --name-only "${BEFORE_SHA}" "${CURRENT_SHA}")"
+          changed = []
+
+          # Manual execution intentionally means:
+          # re-evaluate all already AI-managed problems.
+          global_change = event_name == "workflow_dispatch"
+
+          if (
+              event_name == "push"
+              and event_before
+              and event_before
+                  != "0000000000000000000000000000000000000000"
+          ):
+              result = subprocess.run(
+                  [
+                      "git",
+                      "diff",
+                      "--name-only",
+                      event_before,
+                      current,
+                  ],
+                  check=False,
+                  capture_output=True,
+                  text=True,
+              )
+
+              if result.returncode == 0:
+                  changed = [
+                      line.strip()
+                      for line in result.stdout.splitlines()
+                      if line.strip()
+                  ]
+
+          problem_dirs = set()
+
+          for raw in changed:
+              path = Path(raw)
+
+              if (
+                  len(path.parts) >= 3
+                  and path.parts[0]
+                      == "Data Structures & Algorithms"
+                  and path.name.startswith("submission-")
+                  and path.suffix == ".py"
+              ):
+                  problem_dirs.add(
+                      Path(*path.parts[:-1]).as_posix()
+                  )
+
+              elif (
+                  path.parts
+                  and path.parts[0] == "prompts"
+              ):
+                  global_change = True
+
+              elif raw.startswith(
+                  "src/neetcode_references/"
+              ):
+                  global_change = True
+
+              elif raw == "build_references.py":
+                  global_change = True
+
+          # Global prompt/engine changes regenerate only problems already
+          # controlled by AI state. This deliberately avoids bulk-converting
+          # historical typed/fallback submissions.
+          if global_change:
+              state_path = (
+                  Path("references")
+                  / "data"
+                  / "ai-generation.json"
+              )
+
+              if state_path.exists():
+                  try:
+                      state = json.loads(
+                          state_path.read_text(
+                              encoding="utf-8"
+                          )
+                      )
+                  except (
+                      OSError,
+                      json.JSONDecodeError,
+                  ):
+                      state = {}
+
+                  for problem_dir, entry in (
+                      state.get(
+                          "problems",
+                          {}
+                      ).items()
+                  ):
+                      if (
+                          isinstance(entry, dict)
+                          and entry.get("status")
+                              == "SUCCESS"
+                      ):
+                          problem_dirs.add(
+                              problem_dir
+                          )
+
+          output = Path(
+              os.environ["GITHUB_OUTPUT"]
+          )
+
+          with output.open(
+              "a",
+              encoding="utf-8",
+          ) as handle:
+              handle.write(
+                  "global_change="
+                  + (
+                      "true"
+                      if global_change
+                      else "false"
+                  )
+                  + "\n"
+              )
+
+              handle.write(
+                  "problem_dirs<<EOF\n"
+              )
+
+              for value in sorted(
+                  problem_dirs
+              ):
+                  handle.write(
+                      value + "\n"
+                  )
+
+              handle.write(
+                  "EOF\n"
+              )
+
+          print(
+              "Global change:",
+              global_change,
+          )
+
+          print(
+              "Selected problem directories:"
+          )
+
+          for value in sorted(
+              problem_dirs
+          ):
+              print(
+                  "  -",
+                  value,
+              )
+          PY
+
+      - name: Generate references for selected problems
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-3.5-flash' }}
+
+          AI_GENERATION_ENABLED: "true"
+
+          AI_MAX_REPAIR_ATTEMPTS: ${{ vars.AI_MAX_REPAIR_ATTEMPTS || '1' }}
+          AI_MAX_CALLS_PER_PROBLEM: ${{ vars.AI_MAX_CALLS_PER_PROBLEM || '4' }}
+
+          # Prompt/engine changes may intentionally make multiple managed
+          # references stale. A separate optional global budget allows that
+          # behavior to be controlled without changing normal submission runs.
+          AI_NORMAL_MAX_CALLS_PER_RUN: ${{ vars.AI_MAX_CALLS_PER_RUN || '4' }}
+          AI_GLOBAL_MAX_CALLS_PER_RUN: ${{ vars.AI_GLOBAL_MAX_CALLS_PER_RUN || vars.AI_MAX_CALLS_PER_RUN || '4' }}
+
+          AI_TRANSPORT_RETRIES: ${{ vars.AI_TRANSPORT_RETRIES || '2' }}
+          AI_RETRY_BASE_DELAY_SECONDS: ${{ vars.AI_RETRY_BASE_DELAY_SECONDS || '2' }}
+
+          AI_TEMPERATURE: ${{ vars.AI_TEMPERATURE || '0' }}
+          AI_MAX_OUTPUT_TOKENS: ${{ vars.AI_MAX_OUTPUT_TOKENS }}
+
+          AI_SAVE_FAILED_RESPONSES: "true"
+
+          GLOBAL_CHANGE: ${{ steps.changed.outputs.global_change }}
+          PROBLEM_DIRS: ${{ steps.changed.outputs.problem_dirs }}
+
+        shell: bash
+        run: |
+          if [[ "$GLOBAL_CHANGE" == "true" ]]; then
+            export AI_MAX_CALLS_PER_RUN="$AI_GLOBAL_MAX_CALLS_PER_RUN"
           else
-            CHANGED="$(git show --pretty="" --name-only HEAD)"
+            export AI_MAX_CALLS_PER_RUN="$AI_NORMAL_MAX_CALLS_PER_RUN"
           fi
 
-          printf '%s\n' "${CHANGED}"
+          mapfile -t DIRS <<< "$PROBLEM_DIRS"
 
-          if printf '%s\n' "${CHANGED}" | grep -qE '^prompts/(solution_reference|interview_reference)\.md$'; then
-            echo "all=true" >> "${GITHUB_OUTPUT}"
+          ARGS=()
+
+          for DIR in "${DIRS[@]}"; do
+            if [[ -n "$DIR" ]]; then
+              ARGS+=(--problem-dir "$DIR")
+            fi
+          done
+
+          if [[ "${#ARGS[@]}" -eq 0 ]]; then
+            echo "No AI-managed or changed raw problems require evaluation."
             exit 0
           fi
 
-          {
-            echo "all=false"
-            echo "problem_dirs<<EOF"
-            printf '%s\n' "${CHANGED}" \
-              | grep -E '^Data Structures & Algorithms/.+/submission-[0-9]+\.py$' \
-              | sed 's#/submission-[0-9][0-9]*\.py$##' \
-              | sort -u
-            echo "EOF"
-          } >> "${GITHUB_OUTPUT}"
+          echo "AI run call budget: ${AI_MAX_CALLS_PER_RUN}"
 
-      - name: Generate references for all stale problems
-        if: ${{ steps.scope.outputs.all == 'true' }}
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-3.5-flash' }}
+          python build_references.py \
+            --ai \
+            "${ARGS[@]}"
+
+      - name: Commit generated references
+        id: commit
         shell: bash
         run: |
-          set -euo pipefail
-          ARGS=(--ai)
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]] && [[ "${{ inputs.force }}" == "true" ]]; then
-            ARGS+=(--force-ai)
-          fi
-          python build_references.py "${ARGS[@]}"
-
-      - name: Generate references for changed problems
-        if: ${{ steps.scope.outputs.all != 'true' }}
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-3.5-flash' }}
-          PROBLEM_DIRS: ${{ steps.scope.outputs.problem_dirs }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          ARGS=(--ai)
-          while IFS= read -r problem_dir; do
-            [[ -z "${problem_dir}" ]] && continue
-            ARGS+=(--problem-dir "${problem_dir}")
-          done <<< "${PROBLEM_DIRS}"
-          python build_references.py "${ARGS[@]}"
-
-      - name: Commit accepted generated references
-        shell: bash
-        run: |
-          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add references
+
+          git add \
+            references/solution \
+            references/interview \
+            references/data/ai-generation.json \
+            references/data/references.json \
+            references/README.md \
+            2>/dev/null || true
 
           if git diff --cached --quiet; then
-            echo "No generated reference changes."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No accepted generated changes to commit."
             exit 0
           fi
 
-          git commit -m "chore(auto): generate NeetCode references"
+          git commit \
+            -m "chore: update generated NC-250 references"
+
           git push origin HEAD:main
+
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Notify InterviewForge parent
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.SUBMODULE_UPDATE_TOKEN }}
+          PARENT_REPOSITORY: ${{ vars.PARENT_REPOSITORY }}
+        shell: bash
+        run: |
+          if [[ -z "$GH_TOKEN" ]]; then
+            echo "SUBMODULE_UPDATE_TOKEN is not configured."
+            exit 1
+          fi
+
+          if [[ -z "$PARENT_REPOSITORY" ]]; then
+            echo "PARENT_REPOSITORY repository variable is not configured."
+            exit 1
+          fi
+
+          curl \
+            --fail-with-body \
+            --request POST \
+            --header "Accept: application/vnd.github+json" \
+            --header "Authorization: Bearer ${GH_TOKEN}" \
+            --header "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${PARENT_REPOSITORY}/dispatches" \
+            --data '{
+              "event_type": "submodule-updated",
+              "client_payload": {
+                "source": "neetcode-submissions"
+              }
+            }'

@@ -962,6 +962,12 @@ def validate_interview_reference(
             "preferred implementation.",
         )
 
+    # NC250_V7_3B_INTERVIEW_SEMANTIC_CALL
+    _validate_interview_semantic_safety(
+        result,
+        source,
+    )
+
     return result
 
 
@@ -1367,3 +1373,95 @@ def format_validation_errors(
         issue.code
         for issue in result.errors
     )
+
+# NC250_V7_3B_INTERVIEW_SEMANTIC_HELPERS
+
+_UNSAFE_DOCSTRING_LATEX_RE = re.compile(
+    r"""\\(?:le|ge|frac|text|times|cdot|sqrt|log|sum|begin|end)\b"""
+)
+
+_UNSUPPORTED_INTERVIEW_PHRASES = (
+    "standard memory limits",
+    "standard memory limit",
+    "in most interview scenarios",
+    "in most interviews",
+    "time is prioritized over space",
+    "time complexity is prioritized over space",
+    "highly acceptable",
+    "highly favorable",
+    "the optimal solution",
+    "optimal solution",
+    "optimal time complexity",
+    "the most efficient approach",
+    "fastest expected runtime",
+)
+
+
+def _validate_interview_semantic_safety(
+    result: ValidationResult,
+    source: str,
+) -> None:
+    """
+    Validate deterministic semantic-safety rules for INTERVIEW_REFERENCE.
+
+    This is intentionally narrow.
+
+    It does not attempt general semantic correctness. It only rejects
+    known unsafe Python-docstring notation and unsupported interview /
+    optimization claims that Prompt 2 is explicitly forbidden to emit.
+    """
+
+    unsafe_latex = sorted(
+        set(
+            _UNSAFE_DOCSTRING_LATEX_RE.findall(
+                source
+            )
+        )
+    )
+
+    if unsafe_latex:
+        result.add_error(
+            "UNSAFE_DOCSTRING_LATEX",
+            (
+                "INTERVIEW_REFERENCE contains backslash-based "
+                "LaTeX commands inside the generated Python "
+                "docstring. Use Python-safe plain-text mathematical "
+                "notation instead."
+            ),
+            expected=(
+                "Plain text such as O(n), 0 <= i < n, "
+                "or n(n - 1) / 2"
+            ),
+            actual=", ".join(
+                unsafe_latex
+            ),
+        )
+
+    lowered = source.lower()
+
+    found_phrases = [
+        phrase
+        for phrase in _UNSUPPORTED_INTERVIEW_PHRASES
+        if phrase in lowered
+    ]
+
+    if found_phrases:
+        result.add_error(
+            "UNSUPPORTED_INTERVIEW_ASSUMPTION",
+            (
+                "INTERVIEW_REFERENCE contains unsupported "
+                "interview, memory-limit, efficiency, or "
+                "optimality language. Claims must remain grounded "
+                "in the accepted Solution and authoritative "
+                "problem metadata."
+            ),
+            expected=(
+                "Evidence-bound wording with no invented "
+                "interviewer preference, memory assumption, "
+                "or global optimality claim"
+            ),
+            actual=", ".join(
+                found_phrases
+            ),
+        )
+

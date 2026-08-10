@@ -11,9 +11,7 @@ from typing import Any
 
 
 STATE_SCHEMA_VERSION = 2
-VALIDATOR_SCHEMA_VERSION = 2
-
-
+VALIDATOR_SCHEMA_VERSION = 3
 def stable_hash(text: str) -> str:
     return hashlib.sha256(
         text.encode("utf-8")

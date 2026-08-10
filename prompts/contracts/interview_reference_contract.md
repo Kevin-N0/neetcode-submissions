@@ -321,3 +321,70 @@ Do not present unsupported statements as facts, including claims about:
 
 When unsupported, omit the claim or phrase it explicitly as an uncertainty or
 clarification question.
+
+<!-- NC250_V7_3_INTERVIEW_SEMANTIC_SAFETY -->
+
+## V7.3 PYTHON-SAFE DOCSTRING CONTRACT
+
+The generated INTERVIEW_REFERENCE MUST be valid Python source and its
+documentation MUST remain literal when Python parses the file.
+
+Use plain-text mathematical notation.
+
+Allowed examples:
+
+- O(n)
+- O(n^2)
+- O(n log n)
+- 0 <= i < n
+- n(n - 1) / 2
+
+Backslash-based LaTeX commands are forbidden inside generated Python
+docstrings.
+
+Examples of forbidden commands:
+
+- \le
+- \ge
+- \frac
+- \text
+- \times
+- \cdot
+- \sqrt
+- \log
+- \sum
+- \begin
+- \end
+
+
+## V7.3 EVIDENCE CONTRACT
+
+Do not introduce factual or preference claims that are not supported by
+the accepted SOLUTION_REFERENCE or authoritative problem metadata.
+
+In particular, do not invent:
+
+- memory limits
+- interview expectations
+- interviewer priorities
+- company preferences
+- target complexity
+- mutation permission
+- practical performance claims
+- global optimality claims
+
+When information is absent, explicitly state that it is not specified
+when the distinction is relevant.
+
+Do not transform missing information into a "safe assumption".
+
+
+## V7.3 CANONICAL COMPLEXITY CONTRACT
+
+The preferred Solution TIME and SPACE values are canonical.
+
+Interview teaching may explain auxiliary versus total space separately,
+but the final headline complexity must agree with the accepted Solution.
+
+Conflicting complexity conventions anywhere in the Interview reference
+are invalid.

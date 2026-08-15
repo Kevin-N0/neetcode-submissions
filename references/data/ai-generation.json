@@ -37,6 +37,25 @@
       "source_submission": "Data Structures & Algorithms/duplicate-integer/submission-14.py",
       "status": "SUCCESS",
       "validator_schema_version": 3
+    },
+    "Data Structures & Algorithms/longest-common-prefix": {
+      "generation_contract_version": 1,
+      "interview_content_hash": "6c19d1e7d6b660caf9d559907301c872439422c7df5cd89cdeea502b613b9ca5",
+      "interview_contract_version": 1,
+      "interview_prompt_hash": "4e76b6c6bc3d632ffd3ea7af2a72e09c55217419734cfe66e325624621bff2d6",
+      "interview_reference": "references/interview/arrays-and-hashing/longest-common-prefix.py",
+      "last_problem_model_calls": 3,
+      "model": "gemini-3.5-flash",
+      "problem_dir": "Data Structures & Algorithms/longest-common-prefix",
+      "solution_content_hash": "ed89a05e9f4d63c0633c54bef5dec888c2d88c61a411cd4b961c81f3ea7ce5b8",
+      "solution_contract_version": 1,
+      "solution_prompt_hash": "213e166af19004ca6f568b72b2c0673458a87a25814c16570aae5226e3f7d06f",
+      "solution_reference": "references/solution/arrays-and-hashing/longest-common-prefix.py",
+      "source_hash": "7a4b48e64fb98d64453cc7275b97136f9a2a24602720e02d4dbdc1ebd7d16dae",
+      "source_number": 2,
+      "source_submission": "Data Structures & Algorithms/longest-common-prefix/submission-2.py",
+      "status": "SUCCESS",
+      "validator_schema_version": 3
     }
   },
   "schema_version": 2,

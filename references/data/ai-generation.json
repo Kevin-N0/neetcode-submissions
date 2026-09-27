@@ -38,6 +38,25 @@
       "status": "SUCCESS",
       "validator_schema_version": 3
     },
+    "Data Structures & Algorithms/is-anagram": {
+      "generation_contract_version": 1,
+      "interview_content_hash": "a9f611b0a94aae3c115e34dbe6f66d04c77dc8850b3945e6527402ac75785dde",
+      "interview_contract_version": 1,
+      "interview_prompt_hash": "4e76b6c6bc3d632ffd3ea7af2a72e09c55217419734cfe66e325624621bff2d6",
+      "interview_reference": "references/interview/arrays-and-hashing/valid-anagram.py",
+      "last_problem_model_calls": 2,
+      "model": "gemini-3.5-flash",
+      "problem_dir": "Data Structures & Algorithms/is-anagram",
+      "solution_content_hash": "1e095656caa80148b636d7c492c78aa138caefa2455bbb60f853b974585ecdf2",
+      "solution_contract_version": 1,
+      "solution_prompt_hash": "213e166af19004ca6f568b72b2c0673458a87a25814c16570aae5226e3f7d06f",
+      "solution_reference": "references/solution/arrays-and-hashing/valid-anagram.py",
+      "source_hash": "b80c89bfefadd20f73b29917db2c46f932b693a99a6f7db7f099e8db5326dc31",
+      "source_number": 19,
+      "source_submission": "Data Structures & Algorithms/is-anagram/submission-19.py",
+      "status": "SUCCESS",
+      "validator_schema_version": 3
+    },
     "Data Structures & Algorithms/longest-common-prefix": {
       "generation_contract_version": 1,
       "interview_content_hash": "6c19d1e7d6b660caf9d559907301c872439422c7df5cd89cdeea502b613b9ca5",
